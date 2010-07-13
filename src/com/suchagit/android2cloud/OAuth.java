@@ -58,7 +58,8 @@ public class OAuth extends Activity {
 			public void onPageFinished(WebView view, String url){
 				super.onPageFinished(view, url);
 				String callback = host+getResources().getString(R.string.callback_url);
-				if(url.substring(0, callback.length()).equals(callback)){
+				Log.i("android2cloud", url+"|"+callback);
+				if(url.length() >= callback.length() && url.substring(0, callback.length()).equals(callback)){
 					//Toast.makeText(OAuth.this, "Positive: "+url, Toast.LENGTH_LONG).show();
 					Log.i("android2cloud", url);
 					Intent intent = new Intent(OAuth.this, AccountAdd.class);

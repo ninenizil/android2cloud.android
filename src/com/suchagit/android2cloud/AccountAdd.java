@@ -25,6 +25,9 @@ public class AccountAdd extends Activity {
 		if(intent.getExtras() != null && intent.getExtras().getString("account") != null){
 			account_input.setText((CharSequence) intent.getExtras().get("account"));
 			host_input.setText((CharSequence) accounts.getString(intent.getExtras().getString("account"), "||error").split("\\|")[2]);
+		}else{
+			account_input.setText("Default");
+			host_input.setText("http://android2cloud.appspot.com");
 		}
 		final Button submit_button = (Button) findViewById(R.id.go);
 		final Button cancel_button = (Button) findViewById(R.id.cancel);
