@@ -10,4 +10,6 @@
 <string name="callback_url">/callback/</string>
 <string name="postlinkservice_started">android2cloud PostLinkService started.</string>
 <string name="postlinkservice_stopped">android2cloud PostLinkService stopped.</string>
+<string name="postlinkservice_connected">android2cloud PostLinkService connected.</string>
+<string name="postlinkservice_disconnected">android2cloud PostLinkService disconnected.</string>
 </resources>
