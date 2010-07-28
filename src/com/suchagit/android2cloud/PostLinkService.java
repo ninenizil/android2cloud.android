@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 public class PostLinkService extends Service {
     private static final int START_STICKY = 0;
-	private NotificationManager mNM;
+	//private NotificationManager mNM;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -48,10 +48,10 @@ public class PostLinkService extends Service {
 
     @Override
     public void onCreate() {
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        //mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         // Display a notification about us starting.  We put an icon in the status bar.
-        showNotification();
+        //showNotification();
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -64,10 +64,10 @@ public class PostLinkService extends Service {
     @Override
     public void onDestroy() {
         // Cancel the persistent notification.
-        mNM.cancel(R.string.postlinkservice_started);
+        //mNM.cancel(R.string.postlinkservice_started);
 
         // Tell the user we stopped.
-        Toast.makeText(this, R.string.postlinkservice_stopped, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, R.string.postlinkservice_stopped, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -82,26 +82,26 @@ public class PostLinkService extends Service {
     /**
      * Show a notification while this service is running.
      */
-    private void showNotification() {
+    //private void showNotification() {
         // In this sample, we'll use the same text for the ticker and the expanded notification
-        CharSequence text = getText(R.string.postlinkservice_started);
+        //CharSequence text = getText(R.string.postlinkservice_started);
 
         // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(R.drawable.icon, text,
-                System.currentTimeMillis());
+        //Notification notification = new Notification(R.drawable.icon, text,
+        //        System.currentTimeMillis());
 
         // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, PostLink.class), 0);
+        //PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+        //        new Intent(this, PostLink.class), 0);
 
         // Set the info for the views that show in the notification panel.
-        notification.setLatestEventInfo(this, getText(R.string.app_name),
-                       text, contentIntent);
+        //notification.setLatestEventInfo(this, getText(R.string.app_name),
+        //               text, contentIntent);
 
         // Send the notification.
         // We use a layout id because it is a unique number.  We use it later to cancel.
-        mNM.notify(R.string.postlinkservice_started, notification);
-    }
+        //mNM.notify(R.string.postlinkservice_started, notification);
+    //}
     
     public void sendLink(String link, OAuthConsumer consumer, OAuthProvider provider, SharedPreferences preferences){
         // create a consumer object and configure it with the access

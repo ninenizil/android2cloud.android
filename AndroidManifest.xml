@@ -9,6 +9,13 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".AccountList"></activity>
+        <activity android:name=".AccountAdd"></activity>
+        <activity android:name=".OAuth"></activity>
+
+    <service android:name="PostLinkService"></service>
+	<activity android:name="SilentPostLink">
             <intent-filter>
 	            <action
     	           android:name="android.intent.action.SEND" />
@@ -16,12 +23,7 @@
             	   android:name="android.intent.category.DEFAULT" />
             	<data android:mimeType="text/plain" />
             </intent-filter>
-        </activity>
-        <activity android:name=".AccountList"></activity>
-        <activity android:name=".AccountAdd"></activity>
-        <activity android:name=".OAuth"></activity>
-
-    <service android:name="PostLinkService"></service>
+    </activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 
