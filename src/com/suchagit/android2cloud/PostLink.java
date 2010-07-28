@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import oauth.signpost.OAuthConsumer;
+import oauth.signpost.OAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
@@ -23,9 +24,13 @@ import org.apache.http.message.BasicNameValuePair;
 import com.suchagit.android2cloud.R;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,7 +45,11 @@ public class PostLink extends Activity {
 
 	protected SharedPreferences preferences;
 	private static OAuthConsumer consumer;
+	private static OAuthProvider provider;
 	final int ACCOUNT_LIST_REQ_CODE = 0x1337;
+
+    private PostLinkService mBoundService;
+	private boolean mIsBound;
 	
     /** Called when the activity is first created. */
     @Override
@@ -83,55 +92,9 @@ public class PostLink extends Activity {
 	    
 	    go.setOnClickListener(new View.OnClickListener() {
 	    	public void onClick(View v) {
-	            // create a consumer object and configure it with the access
-	            // token and token secret obtained from the service provider
-	    		consumer = new CommonsHttpOAuthConsumer(getResources().getString(R.string.consumer_key),
-	                    getResources().getString(R.string.consumer_secret));
-	            consumer.setTokenWithSecret(preferences.getString("token", "error"), preferences.getString("secret", "error"));
-	            // create an HTTP request to a protected resource
-	            String target = preferences.getString("host", "error")+"/links/add";
-	            List<NameValuePair> formparams = new ArrayList<NameValuePair>();
-	    	    final EditText url_input = (EditText) findViewById(R.id.link_entry);
-	    	    String url = url_input.getText().toString();
-	            formparams.add(new BasicNameValuePair("link", url));
-	            UrlEncodedFormEntity entity = null;
-	    		try {
-	    			entity = new UrlEncodedFormEntity(formparams, "UTF-8");
-	    		} catch (UnsupportedEncodingException e1) {
-	    			// TODO Auto-generated catch block
-	    			e1.printStackTrace();
-	    		}
-	    		HttpPost request = new HttpPost(target);
-	    		request.addHeader("Content-Type", "application/x-www-form-urlencoded");
-	            request.setEntity(entity);
-
-	        	HttpClient client = new DefaultHttpClient();
-	        	ResponseHandler<String> responseHandler = new BasicResponseHandler();
-	        	
-	            // sign the request
-	            try {
-	    			consumer.sign(request);
-	    		} catch (OAuthMessageSignerException e) {
-	    			// TODO Auto-generated catch block
-	    			e.printStackTrace();
-	    		} catch (OAuthExpectationFailedException e) {
-	    			// TODO Auto-generated catch block
-	    			e.printStackTrace();
-	    		} catch (OAuthCommunicationException e) {
-	    			// TODO Auto-generated catch block
-	    			e.printStackTrace();
-	    		}
-
-	    		String returnString = "";
-	            // send the request
-	            try {
-	            	String response = client.execute(request, responseHandler);
-	    			returnString = response;
-	    		} catch (IOException e) {
-	    			// TODO Auto-generated catch block
-	    			e.printStackTrace();
-	    		}
-	    		Toast.makeText(PostLink.this, returnString, Toast.LENGTH_LONG).show();
+	    		/*
+	    		*/
+	    		doBindService();
 	    	}
 	    });
     }
@@ -181,5 +144,58 @@ public class PostLink extends Activity {
 		    final TextView account_display = (TextView) findViewById(R.id.account_label);
 	        account_display.setText("Acount: "+account);
         }
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mBoundService = ((PostLinkService.LocalBinder)service).getService();
+
+            // Tell the user about this for our demo.
+            Toast.makeText(PostLink.this, R.string.postlinkservice_connected,
+                    Toast.LENGTH_SHORT).show();
+
+    	    final EditText link_entry = (EditText) findViewById(R.id.link_entry);
+    		String link = link_entry.getText().toString();
+    		mBoundService.sendLink(link, consumer, provider, preferences);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mBoundService = null;
+            Toast.makeText(PostLink.this, R.string.postlinkservice_disconnected,
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    void doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        bindService(new Intent(PostLink.this, 
+                PostLinkService.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        doUnbindService();
     }
 }

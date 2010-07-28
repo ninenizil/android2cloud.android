@@ -38,6 +38,10 @@ public final class R {
         public static final int consumer_key=0x7f040002;
         public static final int consumer_secret=0x7f040003;
         public static final int hello=0x7f040000;
+        public static final int postlinkservice_connected=0x7f04000a;
+        public static final int postlinkservice_disconnected=0x7f04000b;
+        public static final int postlinkservice_started=0x7f040008;
+        public static final int postlinkservice_stopped=0x7f040009;
         public static final int request_url=0x7f040004;
     }
 }
