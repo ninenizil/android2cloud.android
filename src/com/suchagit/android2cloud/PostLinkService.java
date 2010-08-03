@@ -14,15 +14,14 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +32,7 @@ import android.widget.Toast;
 
 public class PostLinkService extends Service {
     private static final int START_STICKY = 0;
+	GoogleAnalyticsTracker tracker;
 	//private NotificationManager mNM;
 
     /**
@@ -52,6 +52,8 @@ public class PostLinkService extends Service {
 
         // Display a notification about us starting.  We put an icon in the status bar.
         //showNotification();
+        tracker = GoogleAnalyticsTracker.getInstance();
+        tracker.start(getResources().getString(R.string.analytics_ua), this);
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -68,6 +70,7 @@ public class PostLinkService extends Service {
 
         // Tell the user we stopped.
         //Toast.makeText(this, R.string.postlinkservice_stopped, Toast.LENGTH_SHORT).show();
+    	tracker.stop();
     }
 
     @Override
@@ -150,6 +153,7 @@ public class PostLinkService extends Service {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	tracker.dispatch();
 		Toast.makeText(this, returnString, Toast.LENGTH_LONG).show();
     }
 }

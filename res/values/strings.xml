@@ -12,4 +12,5 @@
 <string name="postlinkservice_stopped">android2cloud PostLinkService stopped.</string>
 <string name="postlinkservice_connected">android2cloud PostLinkService connected.</string>
 <string name="postlinkservice_disconnected">android2cloud PostLinkService disconnected.</string>
+<string name="analytics_ua">UA-16332763-5</string>
 </resources>
