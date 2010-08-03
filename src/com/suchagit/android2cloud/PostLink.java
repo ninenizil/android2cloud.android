@@ -1,27 +1,10 @@
 package com.suchagit.android2cloud;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import com.suchagit.android2cloud.R;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -34,9 +17,12 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class PostLink extends Activity {
 
@@ -50,53 +36,91 @@ public class PostLink extends Activity {
 
     private PostLinkService mBoundService;
 	private boolean mIsBound;
+	private String url;
+	
+	GoogleAnalyticsTracker tracker;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tracker = GoogleAnalyticsTracker.getInstance();
+        tracker.start(getResources().getString(R.string.analytics_ua), this);
         preferences = getSharedPreferences(SETTINGS_PREFERENCES, 0);
         String account = preferences.getString("account", "error");
         String host = preferences.getString("host", "error");
         String token = preferences.getString("token", "error");
         String secret = preferences.getString("secret", "error");
-        setContentView(R.layout.main);
-	    final Button go = (Button) findViewById(R.id.go);
-	    final Button change_account = (Button) findViewById(R.id.change_account);
-	    final TextView account_display = (TextView) findViewById(R.id.account_label);
-        if(account.equals("error") || host.equals("error") || token.equals("error") || secret.equals("error")){
-        	go.setClickable(false);
-        	account_display.setText("Account: There's an error with your account. Try removing it and adding it again.");
-        }else{
-        	go.setClickable(true);
-        	account_display.setText("Account: "+account);
-        }
-        
         String intentAction = getIntent().getAction();
-        if (Intent.ACTION_SEND.equals(intentAction)) {
-        	// Share
-	        Bundle extras = getIntent().getExtras();
-	        if (extras != null) {
-	        	String url = extras.getString(Intent.EXTRA_TEXT);
-	        	final EditText url_input = (EditText) findViewById(R.id.link_entry);
-	        	url_input.setText(url);
+        boolean silence = preferences.getBoolean("silence", false);
+        if(!silence || !Intent.ACTION_SEND.equals(intentAction)){
+            tracker.trackPageView("/PostLink");
+        	setContentView(R.layout.main);
+        	final Button go = (Button) findViewById(R.id.go);
+        	final Button change_account = (Button) findViewById(R.id.change_account);
+        	final TextView account_display = (TextView) findViewById(R.id.account_label);
+		    final CheckBox silence_cb = (CheckBox) findViewById(R.id.silence);
+	        silence_cb.setChecked(silence);
+        	if(account.equals("error") || host.equals("error") || token.equals("error") || secret.equals("error")){
+        		go.setClickable(false);
+        		account_display.setText("Account: There's an error with your account. Try removing it and adding it again.");
+        	}else{
+        		go.setClickable(true);
+        		account_display.setText("Account: "+account);
+        	}
+
+	        if (Intent.ACTION_SEND.equals(intentAction)) {
+	        	// Share
+		        Bundle extras = getIntent().getExtras();
+		        if (extras != null) {
+		        	url = extras.getString(Intent.EXTRA_TEXT);
+		        	final EditText url_input = (EditText) findViewById(R.id.link_entry);
+		        	url_input.setText(url);
+		        }
 	        }
+	        
+		    change_account.setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	    			Intent i = new Intent(PostLink.this, AccountList.class);
+	    			startActivityForResult(i, ACCOUNT_LIST_REQ_CODE);        	
+	    		}
+	        });
+		    
+		    go.setOnClickListener(new View.OnClickListener() {
+		    	public void onClick(View v) {
+		    		/*
+		    		*/
+		    		final EditText url_input = (EditText) findViewById(R.id.link_entry);
+		    		url = url_input.getText().toString();
+		    		doBindService();
+		    	}
+		    });
+		    silence_cb.setOnCheckedChangeListener(new OnCheckedChangeListener()
+		    {
+		        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+		        {
+	    			SharedPreferences.Editor editor = preferences.edit();
+	    			editor.putBoolean("silence", isChecked);
+	    			editor.commit();
+	    			//Toast.makeText(PostLink.this, "Silent Send: "+isChecked, Toast.LENGTH_LONG).show();
+		        }
+		    });
+        }else{
+            tracker.trackPageView("/SilentPostLink");
+            if(account.equals("error") || host.equals("error") || token.equals("error") || secret.equals("error")){
+            	Toast.makeText(this, "Error with your account. Please reauthenticate.", Toast.LENGTH_LONG).show();
+            }
+            
+            if (Intent.ACTION_SEND.equals(intentAction)) {
+            	// Share
+    	        Bundle extras = getIntent().getExtras();
+    	        if (extras != null) {
+    	        	url = extras.getString(Intent.EXTRA_TEXT);
+    	        	doBindService();
+    	        }
+            }
+            finish();
         }
-        
-	    change_account.setOnClickListener(new View.OnClickListener() {
-        	public void onClick(View v) {
-    			Intent i = new Intent(PostLink.this, AccountList.class);
-    			startActivityForResult(i, ACCOUNT_LIST_REQ_CODE);        	
-    		}
-        });
-	    
-	    go.setOnClickListener(new View.OnClickListener() {
-	    	public void onClick(View v) {
-	    		/*
-	    		*/
-	    		doBindService();
-	    	}
-	    });
     }
     
     @Override
@@ -156,12 +180,8 @@ public class PostLink extends Activity {
             mBoundService = ((PostLinkService.LocalBinder)service).getService();
 
             // Tell the user about this for our demo.
-            Toast.makeText(PostLink.this, R.string.postlinkservice_connected,
-                    Toast.LENGTH_SHORT).show();
-
-    	    final EditText link_entry = (EditText) findViewById(R.id.link_entry);
-    		String link = link_entry.getText().toString();
-    		mBoundService.sendLink(link, consumer, provider, preferences);
+    		mBoundService.sendLink(url, consumer, provider, preferences);
+        	//Toast.makeText(PostLink.this, "Sent "+url+" to the cloud.", Toast.LENGTH_LONG).show();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -170,8 +190,6 @@ public class PostLink extends Activity {
             // Because it is running in our same process, we should never
             // see this happen.
             mBoundService = null;
-            Toast.makeText(PostLink.this, R.string.postlinkservice_disconnected,
-                    Toast.LENGTH_SHORT).show();
         }
     };
 

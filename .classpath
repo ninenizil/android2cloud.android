@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="libs/httpmime-4.0.1.jar"/>
 	<classpathentry kind="lib" path="libs/signpost-commonshttp4-1.2.1.1.jar"/>
 	<classpathentry kind="lib" path="libs/signpost.jar"/>
+	<classpathentry kind="lib" path="libs/libGoogleAnalytics.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
