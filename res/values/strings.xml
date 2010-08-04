@@ -2,8 +2,8 @@
 <resources>
     <string name="hello">Hello World, PostLink!</string>
     <string name="app_name">android2cloud</string>
-<string name="consumer_key">anonymous</string>
-<string name="consumer_secret">anonymous</string>
+<string name="consumer_key">android2cloud.appspot.com</string>
+<string name="consumer_secret">ySS8cOHGuNgNS9qLsxUhQBH/</string>
 <string name="request_url">/_ah/OAuthGetRequestToken</string>
 <string name="access_url">/_ah/OAuthGetAccessToken</string>
 <string name="authorize_url">/_ah/OAuthAuthorizeToken?btmpl=mobile</string>
