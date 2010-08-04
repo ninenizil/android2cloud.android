@@ -18,6 +18,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 //import android.widget.Toast;
+import android.widget.Toast;
 
 public class OAuth extends Activity {
 	private static OAuthConsumer consumer;
@@ -77,16 +78,16 @@ public class OAuth extends Activity {
 						provider.retrieveAccessToken(consumer, verifier);
 					} catch (OAuthMessageSignerException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthMessageSignerException' to the project page.", Toast.LENGTH_LONG).show();
 					} catch (OAuthNotAuthorizedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthNotAuthorizedException' to the project page.", Toast.LENGTH_LONG).show();
 					} catch (OAuthExpectationFailedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthExpectationFailedException' to the project page.", Toast.LENGTH_LONG).show();
 					} catch (OAuthCommunicationException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthCommunicationException' to the project page.", Toast.LENGTH_LONG).show();
 					}
 					intent.putExtra("token", consumer.getToken());
 					intent.putExtra("secret", consumer.getTokenSecret());
@@ -119,19 +120,19 @@ public class OAuth extends Activity {
 		} catch (OAuthMessageSignerException e) {
 			// TODO Auto-generated catch block
 			target = "OAuthMessageSignerException";
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (OAuthNotAuthorizedException e) {
 			// TODO Auto-generated catch block
 			target = "OAuthNotAuthorizedException";
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (OAuthExpectationFailedException e) {
 			// TODO Auto-generated catch block
 			target = "OAuthExpectationFailedException";
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (OAuthCommunicationException e) {
 			// TODO Auto-generated catch block
 			target = "OAuthCommunicationException";
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return target;
 	}

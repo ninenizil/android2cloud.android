@@ -121,7 +121,7 @@ public class PostLinkService extends Service {
 			entity = new UrlEncodedFormEntity(formparams, "UTF-8");
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Toast.makeText(this, "There was an error with your URL. Please report it on the project page.", Toast.LENGTH_LONG).show();
 		}
 		HttpPost request = new HttpPost(target);
 		request.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -135,13 +135,13 @@ public class PostLinkService extends Service {
 			consumer.sign(request);
 		} catch (OAuthMessageSignerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthMessageSignerException' to the project page.", Toast.LENGTH_LONG).show();
 		} catch (OAuthExpectationFailedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthExpectationFailedException' to the project page.", Toast.LENGTH_LONG).show();
 		} catch (OAuthCommunicationException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthCommunicationException' to the project page.", Toast.LENGTH_LONG).show();
 		}
 
 		String returnString = "";
@@ -149,9 +149,9 @@ public class PostLinkService extends Service {
         try {
         	String response = client.execute(request, responseHandler);
 			returnString = response;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and try again.", Toast.LENGTH_LONG).show();
 		}
     	tracker.dispatch();
 		Toast.makeText(this, returnString, Toast.LENGTH_LONG).show();
