@@ -62,17 +62,18 @@ public class OAuth extends Activity {
 				Log.i("android2cloud", url+"|"+callback);
 				if(url.length() >= callback.length() && url.substring(0, callback.length()).equals(callback)){
 					//Toast.makeText(OAuth.this, "Positive: "+url, Toast.LENGTH_LONG).show();
-					Log.i("android2cloud", url);
+					Log.d("android2cloud", url);
 					Intent intent = new Intent(OAuth.this, AccountAdd.class);
 					intent.putExtra("host", host);
 					String verifier = "";
-					String[] params = url.split("&");
+					String[] params = url.split("\\?|&");
 					for(String param:params){
+						//Toast.makeText(OAuth.this, param, Toast.LENGTH_LONG).show();
+						Log.d("android2cloud", param);
 						if(param.substring(0, 14).equals("oauth_verifier")){
 							verifier = param.substring(15);
-							Log.i("android2cloud", "verifier: "+verifier);
+							Log.d("android2cloud", "verifier: "+verifier);
 						}
-						Log.i("android2cloud", param);
 					}
 					try {
 						provider.retrieveAccessToken(consumer, verifier);
@@ -107,8 +108,14 @@ public class OAuth extends Activity {
         // the URLs which provide request tokens, access tokens, and
         // the URL to which users are sent in order to grant permission
         // to your application to access protected resources
-        consumer = new CommonsHttpOAuthConsumer(r.getString(R.string.consumer_key),
-                r.getString(R.string.consumer_secret));
+		String consumer_key = r.getString(R.string.consumer_key);
+		String consumer_secret = r.getString(R.string.consumer_secret);
+		if(!host.equals("http://android2cloud.appspot.com")){
+			consumer_key = "anonymous";
+			consumer_secret = "anonymous";
+		}
+        consumer = new CommonsHttpOAuthConsumer(consumer_key,
+                consumer_secret);
         provider = new CommonsHttpOAuthProvider(host+r.getString(R.string.request_url), host+r.getString(R.string.access_url), host+r.getString(R.string.authorize_url));
 
         // fetches a request token from the service provider and builds
