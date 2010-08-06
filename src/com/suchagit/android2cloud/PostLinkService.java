@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -109,8 +110,13 @@ public class PostLinkService extends Service {
     public void sendLink(String link, OAuthConsumer consumer, OAuthProvider provider, SharedPreferences preferences){
         // create a consumer object and configure it with the access
         // token and token secret obtained from the service provider
-		consumer = new CommonsHttpOAuthConsumer(getResources().getString(R.string.consumer_key),
-                getResources().getString(R.string.consumer_secret));
+    	String consumer_key = getResources().getString(R.string.consumer_key);
+    	String consumer_secret = getResources().getString(R.string.consumer_secret);
+    	if(!preferences.getString("host", "error").equals("http://android2cloud.appspot.com")){
+    		consumer_key = "anonymous";
+    		consumer_secret = "anonymous";
+    	}
+		consumer = new CommonsHttpOAuthConsumer(consumer_key, consumer_secret);
         consumer.setTokenWithSecret(preferences.getString("token", "error"), preferences.getString("secret", "error"));
         // create an HTTP request to a protected resource
         String target = preferences.getString("host", "error")+"/links/add";
@@ -149,9 +155,11 @@ public class PostLinkService extends Service {
         try {
         	String response = client.execute(request, responseHandler);
 			returnString = response;
-		} catch (Exception e) {
+		} catch (ClientProtocolException e){
+			Toast.makeText(this, "There was an error sending your request Please report this: " + e.getMessage(), Toast.LENGTH_LONG).show();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and try again.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "There was an error sending your request. Please report this: " + e.getMessage(), Toast.LENGTH_LONG).show();
 		}
     	tracker.dispatch();
 		Toast.makeText(this, returnString, Toast.LENGTH_LONG).show();

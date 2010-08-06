@@ -29,6 +29,7 @@
         android:layout_below="@+id/account_entry"/>
     <EditText
         android:id="@+id/host_entry"
+        android:inputType="textUri"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@android:drawable/editbox_background"
