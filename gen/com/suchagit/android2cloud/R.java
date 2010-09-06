@@ -17,14 +17,15 @@ public final class R {
         public static final int account_entry=0x7f050002;
         public static final int account_label=0x7f050001;
         public static final int cancel=0x7f050006;
-        public static final int change_account=0x7f05000a;
+        public static final int change_account=0x7f05000b;
         public static final int description=0x7f050000;
         public static final int go=0x7f050005;
+        public static final int help=0x7f050007;
         public static final int host_entry=0x7f050004;
         public static final int host_label=0x7f050003;
-        public static final int link_entry=0x7f050008;
-        public static final int link_label=0x7f050007;
-        public static final int silence=0x7f050009;
+        public static final int link_entry=0x7f050009;
+        public static final int link_label=0x7f050008;
+        public static final int silence=0x7f05000a;
     }
     public static final class layout {
         public static final int add_account=0x7f030000;

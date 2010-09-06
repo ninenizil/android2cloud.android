@@ -34,12 +34,15 @@ public class OAuth extends Activity {
 		account = "";
 		if(this.getIntent() != null && this.getIntent().getExtras() != null && this.getIntent().getExtras().getString("host") != null){
 			host = this.getIntent().getExtras().getString("host");
+			Log.i("android2cloud", "OAuth(37) host: "+host);
 		}
 		if(this.getIntent() != null && this.getIntent().getExtras() != null && this.getIntent().getExtras().getString("account") != null){
 			account = this.getIntent().getExtras().getString("account");
+			Log.i("android2cloud", "OAuth(41) account: "+account);
 		}
 		//Toast.makeText(this, host, Toast.LENGTH_LONG).show();
 		String oauth_request_url = getRequestURL(host, getResources());
+		Log.i("android2cloud", "OAuth(45) oauth_request_url: "+oauth_request_url);
 		//Toast.makeText(this, oauth_request_url, Toast.LENGTH_LONG).show();
 		WebView browser= new WebView(this);
 		setContentView(browser);
@@ -59,17 +62,15 @@ public class OAuth extends Activity {
 			public void onPageFinished(WebView view, String url){
 				super.onPageFinished(view, url);
 				String callback = host+getResources().getString(R.string.callback_url);
-				Log.i("android2cloud", url+"|"+callback);
+				Log.i("android2cloud", "OAuth(65) callback: "+callback);
+				Log.i("android2cloud", "OAuth(66) url: "+url);
 				if(url.length() >= callback.length() && url.substring(0, callback.length()).equals(callback)){
-					//Toast.makeText(OAuth.this, "Positive: "+url, Toast.LENGTH_LONG).show();
-					Log.d("android2cloud", url);
 					Intent intent = new Intent(OAuth.this, AccountAdd.class);
 					intent.putExtra("host", host);
 					String verifier = "";
 					String[] params = url.split("\\?|&");
 					for(String param:params){
-						//Toast.makeText(OAuth.this, param, Toast.LENGTH_LONG).show();
-						Log.d("android2cloud", param);
+						Log.i("android2cloud", "OAuth(73) param: "+param);
 						if(param.substring(0, 14).equals("oauth_verifier")){
 							verifier = param.substring(15);
 							Log.d("android2cloud", "verifier: "+verifier);
@@ -78,23 +79,24 @@ public class OAuth extends Activity {
 					try {
 						provider.retrieveAccessToken(consumer, verifier);
 					} catch (OAuthMessageSignerException e) {
-						// TODO Auto-generated catch block
 						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthMessageSignerException' to the project page.", Toast.LENGTH_LONG).show();
+						Log.i("android2cloud", "OAuth(84) e.getMessage: "+e.getMessage());
 					} catch (OAuthNotAuthorizedException e) {
-						// TODO Auto-generated catch block
 						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthNotAuthorizedException' to the project page.", Toast.LENGTH_LONG).show();
+						Log.i("android2cloud", "OAuth(86) e.getMessage: "+e.getMessage());
 					} catch (OAuthExpectationFailedException e) {
-						// TODO Auto-generated catch block
 						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthExpectationFailedException' to the project page.", Toast.LENGTH_LONG).show();
+						Log.i("android2cloud", "OAuth(89) e.getMessage: "+e.getMessage());
 					} catch (OAuthCommunicationException e) {
-						// TODO Auto-generated catch block
 						Toast.makeText(OAuth.this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthCommunicationException' to the project page.", Toast.LENGTH_LONG).show();
+						Log.i("android2cloud", "OAuth(92) e.getMessage: "+e.getMessage());
 					}
 					intent.putExtra("token", consumer.getToken());
+					Log.i("android2cloud", "OAuth(95) token: "+consumer.getToken());
 					intent.putExtra("secret", consumer.getTokenSecret());
+					Log.i("android2cloud", "OAuth(97) secret: "+consumer.getTokenSecret());
 					intent.putExtra("account", account);
-					Log.i("android2cloud", "token: "+consumer.getToken());
-					Log.i("android2cloud", "secret: "+consumer.getTokenSecret());
+					Log.i("android2cloud", "OAuth(99) account: "+account);
 					setResult(1, intent);
 					finish();
 				}
@@ -114,6 +116,8 @@ public class OAuth extends Activity {
 			consumer_key = "anonymous";
 			consumer_secret = "anonymous";
 		}
+		Log.i("android2cloud", "OAuth(119) consumer_key: "+consumer_key);
+		Log.i("android2cloud", "OAuth(120) consumer_secret: "+consumer_secret);
         consumer = new CommonsHttpOAuthConsumer(consumer_key,
                 consumer_secret);
         provider = new CommonsHttpOAuthProvider(host+r.getString(R.string.request_url), host+r.getString(R.string.access_url), host+r.getString(R.string.authorize_url));
@@ -124,23 +128,22 @@ public class OAuth extends Activity {
         String target = null;
         try {
 			target = provider.retrieveRequestToken(consumer, host+r.getString(R.string.callback_url));
+			Log.i("android2cloud", "OAuth(131) target: "+target);
 		} catch (OAuthMessageSignerException e) {
-			// TODO Auto-generated catch block
 			target = "OAuthMessageSignerException";
-			//e.printStackTrace();
+			Log.i("android2cloud", "OAuth(134) e.getMessage(): "+e.getMessage());
 		} catch (OAuthNotAuthorizedException e) {
-			// TODO Auto-generated catch block
 			target = "OAuthNotAuthorizedException";
-			//e.printStackTrace();
+			Log.i("android2cloud", "OAuth(137) e.getMessage(): "+e.getMessage());
 		} catch (OAuthExpectationFailedException e) {
-			// TODO Auto-generated catch block
 			target = "OAuthExpectationFailedException";
-			//e.printStackTrace();
+			Log.i("android2cloud", "OAuth(140) e.getMessage(): "+e.getMessage());
 		} catch (OAuthCommunicationException e) {
-			// TODO Auto-generated catch block
-			target = "OAuthCommunicationException";
-			//e.printStackTrace();
+			target = r.getString(R.string.request_url);
+			Log.i("android2cloud", "OAuth(143) e.getMessage(): "+e.getMessage());
+			Log.i("android2cloud", "OAuth(144) provider.request_url: "+host+r.getString(R.string.request_url));
 		}
+		Log.i("android2cloud", "OAuth(146) target: "+target);
 		return target;
 	}
 }
