@@ -46,6 +46,20 @@ public class AccountList extends ListActivity {
         Map<String, ?> accounts = accounts_prefs.getAll();
         int size = accounts.size();
         Object[] account_objects_array = accounts.keySet().toArray();
+        if(size == 1){
+        	Log.i("android2cloud", account_objects_array[0].toString());
+			SharedPreferences.Editor settings_editor = settings.edit();
+			String[] tmpToken = accounts.get(account_objects_array[0].toString()).toString().split("\\|");
+			settings_editor.putString("account", account_objects_array[0].toString());
+			settings_editor.putString("host", tmpToken[2]);
+			settings_editor.putString("token", tmpToken[0]);
+			settings_editor.putString("secret", tmpToken[1]);
+			settings_editor.commit();
+			Log.i("android2cloud", "account: "+account_objects_array[0].toString());
+			Log.i("android2cloud", "host: "+tmpToken[2]);
+			Log.i("android2cloud", "token: "+tmpToken[0]);
+			Log.i("android2cloud", "secret: "+tmpToken[1]);
+        }
         Log.i("android2cloud", "size: "+size);
         size++;
         Log.i("android2cloud", "size++: "+size);

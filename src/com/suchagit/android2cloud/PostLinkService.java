@@ -14,6 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreProtocolPNames;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
@@ -116,20 +117,24 @@ public class PostLinkService extends Service {
     		consumer_key = "anonymous";
     		consumer_secret = "anonymous";
     	}
+		Log.i("android2cloud", "PostLinkService(119) consumer_key: "+consumer_key);
+		Log.i("android2cloud", "PostLinkService(120) consumer_secret: "+consumer_secret);
 		consumer = new CommonsHttpOAuthConsumer(consumer_key, consumer_secret);
         consumer.setTokenWithSecret(preferences.getString("token", "error"), preferences.getString("secret", "error"));
         // create an HTTP request to a protected resource
         String target = preferences.getString("host", "error")+"/links/add";
+		Log.i("android2cloud", "PostLinkService(125) target: "+target);
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         formparams.add(new BasicNameValuePair("link", link));
         UrlEncodedFormEntity entity = null;
 		try {
 			entity = new UrlEncodedFormEntity(formparams, "UTF-8");
 		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
 			Toast.makeText(this, "There was an error with your URL. Please report it on the project page.", Toast.LENGTH_LONG).show();
+			Log.i("android2cloud", "PostLinkService(133) e1.getMessage(): "+e1.getMessage());
 		}
 		HttpPost request = new HttpPost(target);
+		request.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
 		request.addHeader("Content-Type", "application/x-www-form-urlencoded");
         request.setEntity(entity);
 
@@ -140,14 +145,14 @@ public class PostLinkService extends Service {
         try {
 			consumer.sign(request);
 		} catch (OAuthMessageSignerException e) {
-			// TODO Auto-generated catch block
 			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthMessageSignerException' to the project page.", Toast.LENGTH_LONG).show();
+			Log.i("android2cloud", "PostLinkService(147) e.getMessage(): "+e.getMessage());
 		} catch (OAuthExpectationFailedException e) {
-			// TODO Auto-generated catch block
 			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthExpectationFailedException' to the project page.", Toast.LENGTH_LONG).show();
+			Log.i("android2cloud", "PostLinkService(150) e.getMessage(): "+e.getMessage());
 		} catch (OAuthCommunicationException e) {
-			// TODO Auto-generated catch block
 			Toast.makeText(this, "There was an error sending your request. Please remove and re-add your account, and report the error 'OAuthCommunicationException' to the project page.", Toast.LENGTH_LONG).show();
+			Log.i("android2cloud", "PostLinkService(153) e.getMessage(): "+e.getMessage());
 		}
 
 		String returnString = "";
@@ -157,11 +162,13 @@ public class PostLinkService extends Service {
 			returnString = response;
 		} catch (ClientProtocolException e){
 			Toast.makeText(this, "There was an error sending your request Please report this: " + e.getMessage(), Toast.LENGTH_LONG).show();
+			Log.i("android2cloud", "PostLinkService(163) e.getMessage(): "+e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			Toast.makeText(this, "There was an error sending your request. Please report this: " + e.getMessage(), Toast.LENGTH_LONG).show();
+			Log.i("android2cloud", "PostLinkService(166) e.getMessage(): "+e.getMessage());
 		}
     	tracker.dispatch();
 		Toast.makeText(this, returnString, Toast.LENGTH_LONG).show();
+		Log.i("android2cloud", "PostLinkService(170) returnString: "+returnString);
     }
 }
